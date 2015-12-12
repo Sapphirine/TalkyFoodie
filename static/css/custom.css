@@ -1,0 +1,63 @@
+body {
+    background: #00b4ff;
+    color: #333;
+    font: 100% Arial, Sans Serif;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+#spam {
+    text-align: center;
+}
+#background-wrap {
+    bottom: 0;
+    left: 0;
+    padding-top: 50px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: -1;
+}
+
+#RoomInformation, #ChatRoom {
+    background: rgba(0, 0, 0, 0);
+}
+
+#play {
+}
+
+#scrollable {
+    max-height: 50vh;
+    margin: 0px 0px 10px 5px;
+    overflow: scroll;
+    z-index: 2;
+}
+
+#chatrequesponse {
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.night-hotel {
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    padding: -1px;
+    border: none;
+    font: normal 30px/1 "Monoton", Helvetica, sans-serif;
+    color: rgba(255, 255, 255, 1);
+    text-align: center;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    text-shadow: 0 0 10px rgb(255, 255, 255), 0 0 20px rgb(255, 255, 255), 0 0 30px rgb(255, 255, 255), 0 0 40px rgb(255, 17, 119), 0 0 70px rgb(255, 17, 119), 0 0 80px rgb(255, 17, 119), 0 0 100px rgb(255, 17, 119), 0 0 150px rgb(255, 17, 119);
+    -webkit-transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1) 10ms;
+    -moz-transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1) 10ms;
+    -o-transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1) 10ms;
+    transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1) 10ms;
+}
+
+.night-hotel:hover {
+    text-shadow: 0 0 5px rgb(255, 255, 255), 0 0 10px rgb(255, 255, 255), 0 0 15px rgb(255, 255, 255), 0 0 20px rgb(255, 17, 119), 0 0 35px rgb(255, 17, 119), 0 0 40px rgb(255, 17, 119), 0 0 50px rgb(255, 17, 119), 0 0 75px rgb(255, 17, 119);
+}
