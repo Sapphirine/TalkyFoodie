@@ -1,0 +1,103 @@
+{% block food %}
+    <div class="modal fade" id="hostModal" tabindex="-1" role="dialog" aria-labelledby="hostModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="hostModalLabel" style="text-align: center">I'm The Host!</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="text-align: center;padding: 0px 0px 10px 0px">
+                        <img src="{{ url_for('static', filename='background/host.jpeg') }}"/>
+                    </div>
+                    <button id="hostButton" class="btn btn-success" onclick="requestHost()" style="width:100%">Host
+                    </button>
+                    <div hidden id="hostConfirm">
+                        <h4 id="newGeneratedNumber" style="text-align: center">My Room Number: </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="joinModal" tabindex="-1" role="dialog" aria-labelledby="joinModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="joinModalLabel" style="text-align:center">What's My Friend's Room
+                        Number?</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="text-align: center;padding: 0px 0px 10px 0px">
+                        <img src="{{ url_for('static', filename='background/join.jpeg') }}"/>
+                    </div>
+                    <input type="text" placeholder="My Friend's Room Number" class="form-control" id="room_number"
+                           autofocus>
+                    <button class="btn btn-primary" onclick="requestJoin()" style="width:100%">confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="room-info-window" class="col-sm-4 col-md-4" style="padding:5px">
+        <div id="RoomInformation" class="panel panel-default">
+            <div id="roomHead" class="panel-heading">
+                <b>
+                    Rooms
+                </b>
+            </div>
+            <div id="event-table" class="panel-body">
+                <div class="row" id="event-table-detail">
+                    <div class=" col-sm-12 col-md-12">
+                        <div class=" col-sm-6 col-md-6">
+                            <!-- join button -->
+                            <button id="outsideHostButton" type="button" class="button btn btn-success btn-lg"
+                                    data-toggle="modal" data-content="I wanna open a room!" data-target="#hostModal"
+                                    style="width:100%">
+                                Host
+                            </button>
+                        </div>
+                        <div class=" col-sm-6 col-md-6">
+                            <button id="outsideJoinButton" type="button" class="btn btn-primary btn-lg button"
+                                    data-toggle="modal" data-content="I wanna go to my friend's room!"
+                                    data-target="#joinModal" style="width:100%">
+                                Join
+                            </button>
+                        </div>
+                        <div hidden id="roomInfo" class="col-sm-12 col-md-12">
+                            <h1 style="margin:0;text-align: center;width: 100%"><span id="roomNumberLabel"
+                                                                                      class="label label-info"></span>
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="foodMap" class="panel panel-default" data-username="{{ myUserName }}">
+            <div class="panel-heading"><b>Chat&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</b>
+                <button id='play' class="big circular ui icon green button disabled">
+                    <i id='mic' class="icon unmute"></i>
+                </button>
+            </div>
+            <div id="event-table" class="panel-body">
+                <div id="scrollable">
+                    <div id="chat-wrapper" class="col-sm-12 col-md-12 col-lg-12">
+                        <div id="chatresponse" class="ui comments"></div>
+                    </div>
+                </div>
+                <div class=" col-sm-8 col-md-8 " style="padding:0px 0px">
+                    <input type="text" class="form-control" id="chat_message" placeholder="Chat with your friend!"
+                           onkeydown="pressToSend(event)">
+                </div>
+                <div class=" col-sm-4 col-md-4 " style="padding:0px 0px">
+                    <button class="btn btn-primary" style="width:100%" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
