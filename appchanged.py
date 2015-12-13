@@ -48,20 +48,10 @@ def classifySentiment(words, happy_log_probs, sad_log_probs):
 
     return prob_happy, prob_sad
 
-def Average(lis):
-    r=0.0
-    for i in lis:
-        r+=i
-    result=r/len(lis)
-    return (round(result,5))
 def list_all_dict(dict_a):#使用isinstance检测数据类型
-    for x in range(len(dict_a)-1):
-        temp_key = list(dict_a.keys())[x]
-        temp_value = dict_a[temp_key]
-        for y in range(len(temp_value)-1):
-            key = list(temp_value.keys())[y]
-            value = temp_value[key]
-            scorefile = open('scorefile.txt','w').writelines(str(temp_key)+','+str(key)+','+str(value))
+    for keys in dict_a:
+        for k in dict_a[keys]: #RuntimeError: dictionary changed size during iteration
+            scorefile = open('scorefile.txt','w').writelines(str(keys)+','+str(k)+','+str(dict_a[keys][k][0])+'\n')
     global t
     t = threading.Timer(10.0, list_all_dict, [fdict])  
     t.start() 
@@ -77,21 +67,38 @@ def analyze(sentence, dic):
         for word in lines:
             if word in foods:
                 if word == hashtagfood:
-                    dic[user_name].setdefault(word,[]).append(tweet_happy_prob)
+                    if word in dic[user_name].keys():
+                        mean = dic[user_name][word][0]
+                        count = dic[user_name][word][1]
+                        mean = (mean*count+tweet_happy_prob)/(count+1)
+                        count = count + 1 
+                        dic[user_name][word]=[mean, count]
+                    else:
+                        dic[user_name].setdefault(word,[tweet_happy_prob, 1])
+
                 else: 
                     for keys in dic:
                         if keys!=user_name:
-                            dic[keys].setdefault(word,[]).append(tweet_happy_prob+0.5)
-                        elif  keys == user_name:
-                            dic[keys].setdefault(word,[]).append(tweet_happy_prob)
-    for x in range(len(dic)-1):
-        k = list(dic.keys())[x]
-        v = dic[k]
-        for y in range(len(v)-1):
-            key0 = list(v.keys())[y]
-            value0 = list(v[key0]) #TypeError: 'numpy.float64' object is not iterable
-            print (value0)
-            dic[k][key0] = Average(value0) 
+                            if word in dic[keys].keys():
+                                mean = dic[user_name][word][0]
+                                count = dic[user_name][word][1]
+                                mean = (mean*count+tweet_happy_prob+0.5)/(count+1)
+                                count = count + 1 
+                                dic[keys][word]=[mean, count]
+                            else:
+                                dic[keys].setdefault(word,[tweet_happy_prob+0.5, 1])
+
+                        elif keys == user_name:
+                            if word in dic[keys].keys():
+                                mean = dic[user_name][word][0]
+                                count = dic[user_name][word][1]
+                                mean = (mean*count+tweet_happy_prob)/(count+1)
+                                count = count + 1 
+                                dic[user_name][word]=[mean, count]
+                            else:
+                                dic[keys].setdefault(word,[tweet_happy_prob, 1])
+                    
+
     return dic
 
 @app.errorhandler(404)
