@@ -30,7 +30,7 @@ def home():
             if session['username'] not in users:
                 users.append(session['username'])
                 break
-    print session['username']
+    print (session['username'])
     return render_template("index.html", myUserName=session['username'])
 
 
@@ -50,7 +50,7 @@ def test_message(message):
 
 @socketio.on('chat broadcast', namespace='/test')
 def room_chat(message):
-    print message
+    print (message)
     room = message['room']
     data = message['data']
     emit('chat message receive', {'data': data}, room=room)
@@ -86,7 +86,7 @@ def spam(message):
 
 
 def analyze(text):
-    print text
+    print (text)
 
 
 
