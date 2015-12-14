@@ -4,8 +4,6 @@ from flask.ext.socketio import join_room, leave_room
 from flask.ext.socketio import SocketIO, emit
 import names, random
 import numpy as np
-import time
-import numpy
 import threading
 import os
 
@@ -49,12 +47,11 @@ def classifySentiment(words, happy_log_probs, sad_log_probs):
 
     return prob_happy, prob_sad
 
-def list_all_dict(dict_a):#使用isinstance检测数据类型
-    scorefile = open('scorefile.txt','w')
+def list_all_dict(dict_a):
+    scorefile = open('scorefile.txt', 'w')
     for keys in dict_a:
-        for k in dict_a[keys]: #RuntimeError: dictionary changed size during iteration
+        for k in dict_a[keys]:
             scorefile.writelines(str(keys)+','+str(k)+','+str(dict_a[keys][k][0])+'\n')
-    os.system("ls -l")
     global t
     t = threading.Timer(30.0, list_all_dict, [fdict])  
     t.start() 

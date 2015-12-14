@@ -1,8 +1,7 @@
 var playing = false;
 var localstream, localrecorder;
-var bufferSize = 4096, bufferNum = 1;
+var bufferSize = 4096;
 var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-var audioBuffer = audioCtx.createBuffer(1, bufferNum * bufferSize, audioCtx.sampleRate);
 
 function initializeRecorder(stream) {
     localstream = stream;
@@ -38,16 +37,6 @@ socket.on('error', function (e) {
     console.log(e);
 });
 
-peer.on('call', function(call) {
-  getUserMedia({video: true, audio: true}, function(stream) {
-    call.answer(stream); // Answer the call with an A/V stream.
-    call.on('stream', function(remoteStream) {
-        console.log('sent talk');
-    });
-  }, function(err) {
-    console.log('Failed to get local stream' ,err);
-  });
-});
 
 $('#play').click(function () {
     if (!playing) {
