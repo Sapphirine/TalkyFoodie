@@ -49,9 +49,10 @@ def classifySentiment(words, happy_log_probs, sad_log_probs):
     return prob_happy, prob_sad
 
 def list_all_dict(dict_a):#使用isinstance检测数据类型
+    scorefile = open('scorefile.txt','w')
     for keys in dict_a:
         for k in dict_a[keys]: #RuntimeError: dictionary changed size during iteration
-            scorefile = open('scorefile.txt','w').writelines(str(keys)+','+str(k)+','+str(dict_a[keys][k][0])+'\n')
+            scorefile.writelines(str(keys)+','+str(k)+','+str(dict_a[keys][k][0])+'\n')
     global t
     t = threading.Timer(10.0, list_all_dict, [fdict])  
     t.start() 
