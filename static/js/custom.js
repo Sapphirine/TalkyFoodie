@@ -1,16 +1,13 @@
 var namespace = '/test';
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
 var host = false;
+var peer_api = 'unl8wqyitfv18aor', peer;
+var username = $('#username').data('username');
 
 socket.on('connect', function () {
+    peer = new Peer({key: peer_api});
 });
-socket.on('commit join', function (msg) {
-    if (phoneNumber == msg.username) {
-        document.getElementById("room_number").value = msg.room;
-        console.log($('#username').data('username'));
-        socket.emit('request join', {data: msg.room});
-    }
-});
+
 socket.on('host confirm', function (msg) {
     var roomNumber = document.getElementById("room_number");
     host = true;
@@ -21,18 +18,23 @@ socket.on('host confirm', function (msg) {
     document.getElementById("roomNumberLabel").innerHTML = "Room Number: " + msg.data;
     hideActionButton();
 });
+
 socket.on('join confirm', function (msg) {
     roomNumber = document.getElementById("room_number");
     roomNumber.readOnly = true;
     document.getElementById("roomNumberLabel").innerHTML = "Room Number: " + msg.data;
+    connectPeers(msg.peers);
     hideActionButton();
 });
+
 socket.on('chat message receive', function (msg) {
     appendChat(msg.data);
 });
-function inviteFriend() {
-    $('.close').click();
-}
+
+peer.on('open', function(id) {
+    socket.emit('new peer', {username: username, peer : id});
+});
+
 function requestHost() {
     socket.emit('request host', {data: 'whatever'});
     $('.close').click();
@@ -53,6 +55,9 @@ function pressToSend(event) {
     if (event.keyCode == 13) {
         sendMessage();
     }
+}
+function connectPeers(peers) {
+    console.log(1);
 }
 $('.button').popup({
     on: 'hover',
