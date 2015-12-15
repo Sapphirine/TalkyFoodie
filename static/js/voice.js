@@ -99,7 +99,7 @@ if ('webkitSpeechRecognition' in window) {
         console.log('recognition ended');
     };
     recognition.onresult = function (event) {
-        var interim_transcript = '';
+        var interim_transcript = '', old_final_transcript = final_transcript;
         for (var i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
                 final_transcript += event.results[i][0].transcript;
@@ -107,7 +107,8 @@ if ('webkitSpeechRecognition' in window) {
                 interim_transcript += event.results[i][0].transcript;
             }
         }
-        if (final_transcript) $('#chat_message').val(final_transcript);
+        if (old_final_transcript != final_transcript)
+            $('#chat_message').val(final_transcript);
     };
 }
 
@@ -120,15 +121,17 @@ $('#play').click(function () {
         } else {
             localstream.getTracks()[0].enabled = true;
         }
-        final_transcript = '';
-        recognition.lang = 'en-US';
-        recognition.start();
-        ignore_onend = false;
+        if (recognition) {
+            final_transcript = '';
+            recognition.lang = 'en-US';
+            recognition.start();
+            ignore_onend = false;
+        }
         $('#mic').switchClass('unmute', 'mute', '10', 'linear');
         $(this).switchClass('green', 'red', 2000, 'swing');
     } else {
         console.log('closed');
-        recognition.stop();
+        if (recognition) recognition.stop();
         if (localstream) localstream.getTracks()[0].enabled = false;
         console.log(123);
         playing = false;

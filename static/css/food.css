@@ -11,6 +11,7 @@ table {
 }
 
 #listing {
+    background-color: #FFFFFF;
     height: 60vh;
     overflow: scroll;
     top: 10px;

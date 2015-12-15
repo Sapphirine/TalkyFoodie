@@ -42,10 +42,7 @@ socket.on('connect', function () {
 
 socket.on('join confirm', function (msg) {
     var roomNumber = $("#room_number");
-    var roomNumberText = $("#roomName");
     roomNumber.val(msg.room);
-    roomNumberText.html(roomNumberText.html() + msg.room);
-    roomNumber.prop("readonly", true);
     $("#roomNumberLabel").html("Room Topic: " + msg.room);
     curr_room = msg.room;
     peers = msg.peers;
@@ -68,6 +65,7 @@ function requestRandom() {
 }
 function requestJoin() {
     var room = $("#room_number").val();
+    if (!room) return;
     socket.emit('request join', {from: curr_room, to: room, username: $('#username').data('username'), peer: peer_id});
     $('.close').click();
 }
@@ -76,6 +74,7 @@ function hideActionButton() {
     $('#randomButton').hide();
     $('#joinButton').hide();
     $('#roomInfo').show();
+    $('#changeRoom').show();
 }
 function pressToSend(event) {
     if (event.keyCode == 13) {
@@ -146,4 +145,8 @@ function appendChat(msg) {
 $('.button').popup({
     on: 'hover',
     closable: false
+});
+
+$(document).on("click", ".recommend", function () {
+    $('#room_number').val($(this).text());
 });

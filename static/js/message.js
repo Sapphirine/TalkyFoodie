@@ -1,6 +1,5 @@
 var spam_event;
 var spamming = false;
-var google_map_key = 'AIzaSyADLJGozwf27bx-BrTJf-BDAFUf827D5Mk';
 
 function qing() {
     var spam = $('#spam');
@@ -22,12 +21,24 @@ function qing() {
 
 
 function mei() {
-    var msg = ['sushi', 'icecream', 'pasta', 'ramen', 'steak'];
-    recommend(shuffle(msg));
+    var msg = {};
+    msg[username] = ['sushi', 'icecream', 'pasta', 'ramen', 'pizza', 'chowmen', 'coffee'];
+    shuffle(msg[username]);
+    recommend(msg);
 }
 
 function recommend(msg) {
-    console.log(msg);
+    $('#foodrecommend').slideUp("slow", function () {
+        var foods = msg[username];
+        var count = 1;
+        for (var index = 0; count <= 5 && index < foods.length; index++) {
+            if (foods[index] == curr_room) continue;
+            $('#foodButton' + count).text(foods[index]);
+            $('#foodButton' + count).show();
+            count++;
+        }
+    });
+    $('#foodrecommend').slideDown(2000);
 }
 
 function shuffle(array) {
