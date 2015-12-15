@@ -24,7 +24,10 @@ function qing() {
 function mei() {
     var msg = ['sushi', 'icecream', 'pasta', 'ramen', 'steak'];
     recommend(shuffle(msg));
-}
+    var map;
+    var infowindow;
+
+    
 
 function recommend(msg) {
     console.log(msg);

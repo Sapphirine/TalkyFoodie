@@ -1,5 +1,8 @@
 body {
-    background: #00b4ff;
+    background-image: url("background.jpg");
+
+    background-repeat:no-repeat;
+    background-size:100% 100%;
     color: #333;
     font: 100% Arial, Sans Serif;
     height: 100vh;
@@ -22,7 +25,10 @@ body {
 }
 
 #RoomInformation, #ChatRoom {
-    background: rgba(0, 0, 0, 0);
+    background-image: url("chatback.png");
+
+    background-repeat:no-repeat;
+    background-size:100% 100%;;
 }
 
 #play {
