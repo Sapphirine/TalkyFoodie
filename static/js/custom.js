@@ -27,6 +27,7 @@ peer.on('call', function (call) {
     } else {
         navigator.getUserMedia({video: false, audio: true}, function (stream) {
             localstream = stream;
+            process(localstream);
             call.answer(localstream);
         }, function (err) {
             console.log('Failed to get local stream', err);
@@ -90,6 +91,7 @@ function connectPeers() {
                 navigator.getUserMedia({video: false, audio: true}, function (stream) {
                     console.log('called', other);
                     localstream = stream;
+                    process(localstream);
                     var call = peer.call(other, stream);
                     call.on('stream', onReceiveStream);
                 }, function (err) {

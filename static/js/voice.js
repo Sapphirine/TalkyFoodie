@@ -1,8 +1,19 @@
-var bufferSize = 4096;
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var mediaStream,
+    audioContext = new AudioContext(),
+    mediaStreamSource,
+    audioMeter;
 
 function createAudioMeter(audioContext, clipLevel, averaging, clipLag) {
-    var processor = audioContext.createScriptProcessor(512);
+    var from = 200;
+    var to = 5000;
+    var geometricMean = Math.sqrt(from * to);
+    var filter = audioContext.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = geometricMean;
+    filter.Q.value = geometricMean / (to - from);
+
+    var processor = audioContext.createScriptProcessor(4096);
     processor.onaudioprocess = volumeAudioProcess;
     processor.clipping = false;
     processor.lastClip = 0;
@@ -10,9 +21,7 @@ function createAudioMeter(audioContext, clipLevel, averaging, clipLag) {
     processor.clipLevel = clipLevel || 0.98;
     processor.averaging = averaging || 0.95;
     processor.clipLag = clipLag || 750;
-
-    // this will have no effect, since we don't copy the input to the output,
-    // but works around a current Chrome bug.
+    filter.connect(processor);
     processor.connect(audioContext.destination);
 
     processor.checkClipping =
@@ -30,9 +39,34 @@ function createAudioMeter(audioContext, clipLevel, averaging, clipLag) {
             this.onaudioprocess = null;
         };
 
-    return processor;
+    return filter;
 }
 
+function volumeAudioProcess(event) {
+    var buf = event.inputBuffer.getChannelData(0);
+    var bufLength = buf.length;
+    var sum = 0;
+    var x;
+
+    for (var i=0; i<bufLength; i++) {
+        x = buf[i];
+        if (Math.abs(x)>=this.clipLevel) {
+            this.clipping = true;
+            this.lastClip = window.performance.now();
+        }
+        sum += x * x;
+    }
+
+    var rms =  Math.sqrt(sum / bufLength);
+    this.volume = Math.max(rms, this.volume*this.averaging);
+}
+
+function process(localMediaStream) {
+    mediaStream = localMediaStream;
+    mediaStreamSource = audioContext.createMediaStreamSource(mediaStream);
+    audioMeter = createAudioMeter(audioContext);
+    mediaStreamSource.connect(audioMeter);
+}
 
 socket.on('error', function (e) {
     console.log(e);
@@ -41,9 +75,7 @@ socket.on('error', function (e) {
 
 // https://github.com/GoogleChrome/webplatform-samples/blob/master/webspeechdemo/webspeechdemo.html
 
-if (!('webkitSpeechRecognition' in window)) {
-    upgrade();
-} else {
+if ('webkitSpeechRecognition' in window) {
     var recognition = new webkitSpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
@@ -53,8 +85,10 @@ if (!('webkitSpeechRecognition' in window)) {
     };
     recognition.onerror = function (event) {
         if (event.error == 'no-speech') {
+            ignore_onend = true;
         }
         if (event.error == 'audio-capture') {
+            ignore_onend = true;
         }
         if (event.error == 'not-allowed') {
             ignore_onend = true;

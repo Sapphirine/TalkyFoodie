@@ -69,6 +69,7 @@
                 navigator.geolocation.getCurrentPosition(function (position) {
                     initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                     map.setCenter(initialLocation);
+                    search();
                 }, function () {
                     handleNoGeolocation(browserSupportFlag);
                 });
@@ -94,7 +95,6 @@
         }
 
         function tilesLoaded() {
-            search();
             google.maps.event.clearListeners(map, 'tilesloaded');
             google.maps.event.addListener(map, 'zoom_changed', searchIfRankByProminence);
             google.maps.event.addListener(map, 'dragend', search);
