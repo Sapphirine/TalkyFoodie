@@ -2,7 +2,7 @@ var namespace = '/test';
 var peer_api = 'unl8wqyitfv18aor', peer_id;
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
 //var peer = new Peer({host: 'localhost', port: 9000, path: '/'});
-var peer = new Peer({key: peer_api}), peers = [];
+var peer = new Peer({key: peer_api}), peers = [], localcall;
 var curr_room = '';
 var username = $('#username').data('username');
 var localstream, remotestream;
@@ -46,6 +46,8 @@ socket.on('join confirm', function (msg) {
     $("#roomNumberLabel").html("Room Topic: " + msg.room);
     curr_room = msg.room;
     peers = msg.peers;
+    localstream = null;
+    console.log('received peers from server:', peers);
     $('#keyword').val(curr_room);
     search();
     hideActionButton();
@@ -66,6 +68,14 @@ function requestRandom() {
 function requestJoin() {
     var room = $("#room_number").val();
     if (!room) return;
+    if (playing) {
+        if (recognition) recognition.stop();
+        if (localstream) localstream.getTracks()[0].enabled = false;
+        $('#mic').switchClass('mute', 'unmute', '10', 'linear');
+        $('#play').switchClass('red', 'green', 2000, 'swing');
+        localcall.close();
+        playing = false;
+    }
     socket.emit('request join', {from: curr_room, to: room, username: $('#username').data('username'), peer: peer_id});
     $('.close').click();
 }
@@ -82,7 +92,7 @@ function pressToSend(event) {
     }
 }
 function connectPeers() {
-    console.log(peers);
+    console.log('try to connect to ', peers);
     for (var i = 0; i < peers.length; ++i) {
         var other = peers[i];
         if (other != peer_id) {
@@ -91,8 +101,8 @@ function connectPeers() {
                     console.log('called', other);
                     localstream = stream;
                     process(localstream);
-                    var call = peer.call(other, stream);
-                    call.on('stream', onReceiveStream);
+                    localcall = peer.call(other, stream);
+                    localcall.on('stream', onReceiveStream);
                 }, function (err) {
                     console.log('Failed to get local stream', err);
                 });

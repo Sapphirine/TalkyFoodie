@@ -133,7 +133,6 @@ $('#play').click(function () {
         console.log('closed');
         if (recognition) recognition.stop();
         if (localstream) localstream.getTracks()[0].enabled = false;
-        console.log(123);
         playing = false;
         $('#mic').switchClass('mute', 'unmute', '10', 'linear');
         $(this).switchClass('red', 'green', 2000, 'swing');
