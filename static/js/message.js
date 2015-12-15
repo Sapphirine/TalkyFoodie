@@ -13,7 +13,7 @@ function qing() {
         spam.switchClass('btn-danger', 'btn-primary', 500, 'linear');
         spamming = true;
     } else {
-        spam.text('SPAM');
+        spam.text('QING');
         spam.switchClass('btn-primary', 'btn-danger', 500, 'linear');
         clearInterval(spam_event);
         spamming = false;
@@ -24,10 +24,7 @@ function qing() {
 function mei() {
     var msg = ['sushi', 'icecream', 'pasta', 'ramen', 'steak'];
     recommend(shuffle(msg));
-    var map;
-    var infowindow;
-
-    
+}
 
 function recommend(msg) {
     console.log(msg);

@@ -12,6 +12,7 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 roomCurrTime = {}
 users = []
+peers = {}
 fdict = {}
 words = open("words.txt").read().splitlines()
 foods = open("foodlist.txt").read().splitlines()
@@ -118,32 +119,37 @@ def home():
     return render_template("index.html", myUserName=session['username'])
 
 
-@socketio.on('request host', namespace='/test')
-def test_message(message):
-    room = str(randint(1, 1000))
-    emit('host confirm', {'data': room})
+@socketio.on('request random', namespace='/test')
+def request_random(message):
+    print message
+    room = random.choice(foods)
     join_room(room)
+    if room not in peers:
+        peers[room] = []
+    peers[room].append(message['peer'])
+    emit('join confirm', {'room': room, 'peers': peers[room]})
 
 
 @socketio.on('request join', namespace='/test')
-def test_message(message):
-    room = message['data']
-    join_room(room)
-    emit('join confirm', {'data': room})
+def request_join(message):
+    print message
+    from_room = message['from']
+    to_room = message['to']
+    leave_room(from_room)
+    join_room(to_room)
+    if to_room not in peers:
+        peers[to_room] = []
+    if from_room:
+        peers[from_room].remove(message['peer'])
+    peers[to_room].append(message['peer'])
+    emit('join confirm', {'room': to_room, 'peers': peers[to_room]}, broadcast=True)
 
 
 @socketio.on('chat broadcast', namespace='/test')
 def room_chat(message):
     print (message)
-    room = message['room']
-    data = message['data']
-    emit('chat message receive', {'data': data}, room=room)
-
-
-@socketio.on('voice chat', namespace='/test')
-def voice_chat(message):
-    emit('voice message receive', {'data': message['data'], 'username': message['username']}, room=message['room'],
-              broadcast=True, include_self=False)
+    emit('chat message receive', {'data': message['user'] + ':' + message['message']}, room=message['food'])
+    fdict.update(analyze(message, fdict))
 
 
 @socketio.on('connect', namespace='/test')

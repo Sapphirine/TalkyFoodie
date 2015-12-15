@@ -1,43 +1,55 @@
 var namespace = '/test';
+var peer_api = 'unl8wqyitfv18aor', peer_id;
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
-var host = false;
-var peer_api = 'unl8wqyitfv18aor', peer;
+//var peer = new Peer({host: 'localhost', port: 9000, path: '/'});
+var peer = new Peer({key: peer_api}), peers = [];
+var curr_room = '';
 var username = $('#username').data('username');
+var localstream, remotestream;
+var playing = false;
+var final_transcript = '';
+var recognizing = false;
+var ignore_onend;
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-socket.on('connect', function () {
-    peer = new Peer({key: peer_api})
+peer.on('error', function (error) {
+    console.log(error);
+});
 
-    peer.on('open', function (id) {
-        socket.emit('new peer', {username: username, peer: id});
-    });
+peer.on('open', function (id) {
+    peer_id = id;
+});
 
-    peer.on('call', function (call) {
-        getUserMedia({video: true, audio: true}, function (stream) {
-            call.answer(stream); // Answer the call with an A/V stream.
-            call.on('stream', function (remoteStream) {
-                console.log('sent talk');
-            });
+peer.on('call', function (call) {
+    console.log('got called');
+    if (!playing) {
+        call.answer();
+    } else {
+        navigator.getUserMedia({video: false, audio: true}, function (stream) {
+            localstream = stream;
+            call.answer(localstream);
         }, function (err) {
             console.log('Failed to get local stream', err);
         });
-    });
+    }
+    call.on('stream', onReceiveStream);
 });
 
-socket.on('host confirm', function (msg) {
-    var roomNumber = $("#room_number");
-    host = true;
-    roomNumber.val(msg.data);
-    $("#room_number").prop("readonly", true);
-    var roomNumberText = $("#newGeneratedNumber");
-    roomNumberText.html(roomNumberText.html() + msg.data);
-    $("#roomNumberLabel").html("Room Number: " + msg.data);
-    hideActionButton();
+socket.on('connect', function () {
 });
+
 
 socket.on('join confirm', function (msg) {
-    $("#room_number").prop("readonly", true);
-    $("#roomNumberLabel").html("Room Number: " + msg.data);
-    connectPeers(msg.peers);
+    var roomNumber = $("#room_number");
+    var roomNumberText = $("#roomName");
+    roomNumber.val(msg.room);
+    roomNumberText.html(roomNumberText.html() + msg.room);
+    roomNumber.prop("readonly", true);
+    $("#roomNumberLabel").html("Room Topic: " + msg.room);
+    curr_room = msg.room;
+    peers = msg.peers;
+    $('#keyword').val(curr_room);
+    search();
     hideActionButton();
 });
 
@@ -49,20 +61,19 @@ socket.on('recommendation receive', function (msg) {
     //recommend(msg);
 });
 
-function requestHost() {
-    socket.emit('request host', {data: 'whatever'});
+function requestRandom() {
+    socket.emit('request random', {username: $('#username').data('username'), peer: peer_id});
     $('.close').click();
 }
 function requestJoin() {
-    number = $("#room_number").val();
-    socket.emit('request join', {data: number, username: $('#username').data('username')});
-    $('#joinModal').modal('hide');
+    var room = $("#room_number").val();
+    socket.emit('request join', {from: curr_room, to: room, username: $('#username').data('username'), peer: peer_id});
     $('.close').click();
 }
 function hideActionButton() {
     $('#play').removeClass('disabled');
-    $('#outsideHostButton').hide();
-    $('#outsideJoinButton').hide();
+    $('#randomButton').hide();
+    $('#joinButton').hide();
     $('#roomInfo').show();
 }
 function pressToSend(event) {
@@ -70,8 +81,64 @@ function pressToSend(event) {
         sendMessage();
     }
 }
-function connectPeers(peers) {
-    console.log(1);
+function connectPeers() {
+    console.log(peers);
+    for (var i = 0; i < peers.length; ++i) {
+        var other = peers[i];
+        if (other != peer_id) {
+            !function (other) {
+                navigator.getUserMedia({video: false, audio: true}, function (stream) {
+                    console.log('called', other);
+                    localstream = stream;
+                    var call = peer.call(other, stream);
+                    call.on('stream', onReceiveStream);
+                }, function (err) {
+                    console.log('Failed to get local stream', err);
+                });
+            }(other);
+        }
+    }
+
+}
+
+function onReceiveStream(stream) {
+    remotestream = stream;
+    var audio = document.querySelector('audio');
+    audio.src = window.URL.createObjectURL(stream);
+    audio.onloadedmetadata = function (e) {
+        console.log('now playing the audio');
+        audio.play();
+    }
+}
+
+function sendMessage() {
+    if ($('#chat_message').value == "") {
+        return;
+    }
+    if (!$('#room_number').val()) {
+        alert('Please host or join a room first!');
+        return
+    }
+    var text = $('#chat_message').val();
+    var room_number = $("#room_number").val();
+    socket.emit('chat broadcast', {message: text, food: room_number, user: username});
+    final_transcript = '';
+    $('#chat_message').val("");
+}
+function appendChat(msg) {
+    var chatWindow = $('#chatresponse');
+    var avatar = '<img src="http://api.adorable.io/avatars/60/' + msg.substring(0, msg.indexOf(':')) + '%40adorable.io">';
+    var messageLine = '<div class="comment"><a class="avatar">'
+        + avatar
+        + '</a><div class="content"><a class="author">'
+        + msg.substring(0, msg.indexOf(':'))
+        + '</a><div class="metadata"><span class="date">'
+        + new Date().toLocaleTimeString()
+        + '</span></div><div class="text">'
+        + msg.substring(msg.indexOf(':') + 1)
+        + '</div></div></div>';
+    chatWindow.append(messageLine);
+    document.getElementById('scrollable').scrollTop = document.getElementById('scrollable').scrollHeight;
 }
 
 $('.button').popup({

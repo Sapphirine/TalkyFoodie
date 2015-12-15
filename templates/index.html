@@ -10,11 +10,11 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/socket.io.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/semantic.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/peer.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/peer.js') }}"></script>
     <title>Hello Foodies!</title>
 </head>
 <body>
-<nav id="entireNav" class="navbar navbar-inverse" role="navigation" style="margin:0;background-color: rgba(0,0,0,0.7)">
+<nav id="entireNav" class="navbar navbar-inverse" role="navigation" style="margin-bottom:5px;background-color: rgba(0,0,0,0.7)">
     <div class="container-fluid">
         <div class="navbar-header">
             <a class="navbar-brand" href="/">
@@ -26,6 +26,7 @@
              id="bs-example-navbar-collapse-1">
             <div id="spam" class="circular btn btn-danger navbar-btn" onclick="qing()" >QING</div>
             <div id="spam" class="circular btn btn-info navbar-btn" onclick="mei()" >MEI</div>
+            <audio id="sound" style="display:none"></audio>
             <div class="navbar-form navbar-right">
                 <div class="form-group">
                     <div id="username" data-username="{{ myUserName }}" class="ui inverted basic active button"><i
