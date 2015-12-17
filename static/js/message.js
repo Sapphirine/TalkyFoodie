@@ -28,6 +28,7 @@ function mei() {
 }
 
 function recommend(msg) {
+    console.log(msg);
     $('#foodrecommend').slideUp("slow", function () {
         var foods = msg[username];
         var count = 1;

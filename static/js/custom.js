@@ -58,7 +58,7 @@ socket.on('chat message receive', function (msg) {
 });
 
 socket.on('recommendation receive', function (msg) {
-    //recommend(msg);
+    recommend(msg);
 });
 
 function requestRandom() {

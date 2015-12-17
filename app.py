@@ -1,21 +1,22 @@
 from flask import Flask, render_template, session
-from random import randint
 from flask.ext.socketio import join_room, leave_room
 from flask.ext.socketio import SocketIO, emit
 import names, random
 import numpy as np
 import threading
-import os
+from pyspark.mllib.recommendation import ALS, MatrixFactorizationModel, Rating
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+count = 0
 roomCurrTime = {}
-users = []
 peers = {}
 fdict = {}
 words = open("words.txt").read().splitlines()
 foods = open("foodlist.txt").read().splitlines()
+users = []
 fakeusers = []
 for i in range(10):
     fakeusers.append(names.get_first_name())
@@ -168,14 +169,40 @@ def on_leave(message):
 
 @socketio.on('message', namespace='/test')
 def spam(message):
+    global count
     random_user = random.choice(fakeusers)
     random_food = random.choice(foods)
     random_sentence = {'user': random_user, 'food': random_food, 'message': (' '.join(random.sample(words, 10))).join(random.sample(foods, 2))}
     #work on this function!
     print(random_sentence['message'])
     fdict.update(analyze(random_sentence, fdict))
-    t = threading.Timer(30.0, list_all_dict, [fdict])  
-    t.start()
+    count = count + 1
+    if count >= 10:
+        count = 0
+        recommend(fdict)
+        emit('recommendation receive', fdict[random_user])
+
+
+def recommend(dictionary):
+    # Load and parse the data
+    data = sc.textFile("data/mllib/als/test.data")
+    ratings = data.map(lambda l: l.split(',')).map(lambda l: Rating(int(l[0]), int(l[1]), float(l[2])))
+
+    # Build the recommendation model using Alternating Least Squares
+    rank = 10
+    numIterations = 10
+    model = ALS.train(ratings, rank, numIterations)
+
+    # Evaluate the model on training data
+    testdata = ratings.map(lambda p: (p[0], p[1]))
+    predictions = model.predictAll(testdata).map(lambda r: ((r[0], r[1]), r[2]))
+    ratesAndPreds = ratings.map(lambda r: ((r[0], r[1]), r[2])).join(predictions)
+    MSE = ratesAndPreds.map(lambda r: (r[1][0] - r[1][1])**2).mean()
+    print("Mean Squared Error = " + str(MSE))
+
+    # Save and load model
+    model.save(sc, "myModelPath")
+    sameModel = MatrixFactorizationModel.load(sc, "myModelPath")
 
 
 if __name__ == "__main__":
