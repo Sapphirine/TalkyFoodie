@@ -16,7 +16,7 @@ peers = {}
 fdict = {}
 words = open("words.txt").read().splitlines()
 foods = open("foodlist.txt").read().splitlines()
-users = []
+users = {}, userids = {}
 fakeusers = []
 for i in range(10):
     fakeusers.append(names.get_first_name())
@@ -114,10 +114,10 @@ def home():
         while True:
             session['username'] = names.get_first_name()
             if session['username'] not in users:
-                users.append(session['username'])
+                users[session['username']] = random(range(00000, 99999), 1)
                 break
     print (session['username'])
-    return render_template("index.html", myUserName=session['username'])
+    return render_template("index.html", myUserName=session['username'], myUserID=users[session['username']])
 
 
 @socketio.on('request random', namespace='/test')
@@ -184,25 +184,7 @@ def spam(message):
 
 
 def recommend(dictionary):
-    # Load and parse the data
-    data = sc.textFile("data/mllib/als/test.data")
-    ratings = data.map(lambda l: l.split(',')).map(lambda l: Rating(int(l[0]), int(l[1]), float(l[2])))
-
-    # Build the recommendation model using Alternating Least Squares
-    rank = 10
-    numIterations = 10
-    model = ALS.train(ratings, rank, numIterations)
-
-    # Evaluate the model on training data
-    testdata = ratings.map(lambda p: (p[0], p[1]))
-    predictions = model.predictAll(testdata).map(lambda r: ((r[0], r[1]), r[2]))
-    ratesAndPreds = ratings.map(lambda r: ((r[0], r[1]), r[2])).join(predictions)
-    MSE = ratesAndPreds.map(lambda r: (r[1][0] - r[1][1])**2).mean()
-    print("Mean Squared Error = " + str(MSE))
-
-    # Save and load model
-    model.save(sc, "myModelPath")
-    sameModel = MatrixFactorizationModel.load(sc, "myModelPath")
+    print 123
 
 
 if __name__ == "__main__":

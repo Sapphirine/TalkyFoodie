@@ -29,8 +29,9 @@ function mei() {
 
 function recommend(msg) {
     console.log(msg);
+    var user_id = $('#username').data('userid');
     $('#foodrecommend').slideUp("slow", function () {
-        var foods = msg[username];
+        var foods = msg[user_id];
         var count = 1;
         for (var index = 0; count <= 5 && index < foods.length; index++) {
             if (foods[index] == curr_room) continue;
