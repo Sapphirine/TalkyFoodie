@@ -1,33 +1,28 @@
 from flask import Flask, render_template, session
 from flask.ext.socketio import join_room, leave_room
 from flask.ext.socketio import SocketIO, emit
-import names, random
+import names
+import random
 import numpy as np
-import threading
 from pyspark.mllib.recommendation import ALS, MatrixFactorizationModel, Rating
 import recommend
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
+app.config['SECRET_KEY'] = 'secret!!'
 socketio = SocketIO(app)
-count = 0
+reset = 0
 roomCurrTime = {}
 peers = {}
 fdict = {}
-words = open("words.txt").read().splitlines()
 foods = open("foodlist.txt").read().splitlines()
 users = {}
-fakeusers = {}
-for i in range(10):
-    name = names.get_first_name()
-    fakeusers.setdefault(name)
-    fakeusers[name] = random.choice(range(00000, 99999))
+
 
 def readSentimentList(file_name):
     ifile = open(file_name, 'r')
     happy_log_probs = {}
     sad_log_probs = {}
-    ifile.readline() #Ignore title row
+    ifile.readline()
     
     for line in ifile:
         tokens = line[:-1].split(',')
@@ -56,14 +51,12 @@ def list_all_dict(dict_a):
     for keys in dict_a:
         for k in dict_a[keys]:
             scorefile.writelines(str(keys)+','+str(foods.index(k))+','+str(dict_a[keys][k][0])+'\n')
-    global t
-    t = threading.Timer(30.0, list_all_dict, [fdict])  
-    t.start() 
+
 
 def analyze(sentence, dic):
     happy_log_probs, sad_log_probs = readSentimentList('twitter_sentiment_list.csv')
     user_name = sentence.setdefault('user')
-    lines = sentence.setdefault('message').split()
+    lines = sentence.setdefault('text').split()
     hashtagfood = sentence.setdefault('food')
     dic.setdefault(user_name,{})
     tweet_happy_prob, tweet_sad_prob = classifySentiment(lines, happy_log_probs, sad_log_probs)
@@ -114,11 +107,12 @@ def page_not_found():
 def home():
     if 'username' not in session:
         while True:
-            session['username'] = names.get_first_name()
-            if session['username'] not in users:
-                users[session['username']] = random.choice(range(00000, 99999))
+            name = names.get_first_name()
+            if name not in users:
+                session['username'] = name
+                print name
+                users[name] = random.choice(range(00000, 99999))
                 break
-    print (session['username'])
     return render_template("index.html", myUserName=session['username'], myUserID=users[session['username']])
 
 
@@ -150,9 +144,18 @@ def request_join(message):
 
 @socketio.on('chat broadcast', namespace='/test')
 def room_chat(message):
-    print (message)
-    emit('chat message receive', {'data': message['user'] + ':' + message['message']}, room=message['food'])
+    #print (message)
+    global reset
+    emit('chat message receive', {'data': message['username'] + ':' + message['text']}, room=message['food'])
     fdict.update(analyze(message, fdict))
+    reset += 1
+    print reset
+    if reset >= 10:
+        reset = 0
+        list_all_dict(fdict)
+        result = recommend.Recommendation('scorefile.txt', foods)
+        print result
+        emit('recommendation receive', result)
 
 
 @socketio.on('connect', namespace='/test')
@@ -169,25 +172,6 @@ def on_leave(message):
     print('leave')
 
 
-@socketio.on('message', namespace='/test')
-def spam(message):
-    global count
-    random_user_id = random.choice(list(fakeusers.values()))
-    random_food = random.choice(foods)
-    random_sentence = {'user': random_user_id, 'food': random_food, 'message': (' '.join(random.sample(words, 10))).join(random.sample(foods, 2))}
-    print(random_sentence['message'])
-    fdict.update(analyze(random_sentence, fdict))
-    count = count + 1
-    if count >= 10:
-        count = 0
-        list_all_dict(fdict)
-        foods_recommend = []
-        result = recommend.Recommendation('scorefile.txt', foods)
-        emit('recommendation receive', result)
-
-
-
-
-
 if __name__ == "__main__":
     socketio.run(app, '0.0.0.0', 8080)
+

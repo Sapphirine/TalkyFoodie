@@ -51,5 +51,6 @@ table {
 }
 
 #foodrecommend {
+    display: none;
     margin-top: 20px;
 }

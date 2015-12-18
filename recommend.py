@@ -23,5 +23,6 @@ def Recommendation(filename, foods):
 			recommenddict[user].append(foods[Rating.product])
 		#recommenddict[user].append(Rating[1])       
 	print (recommenddict)
+	sc.stop()
 	return recommenddict
 

@@ -4,7 +4,7 @@ var socket = io.connect('http://' + document.domain + ':' + location.port + '/te
 //var peer = new Peer({host: 'localhost', port: 9000, path: '/'});
 var peer = new Peer({key: peer_api}), peers = [], localcall;
 var curr_room = '';
-var username = $('#username').data('username');
+var username = $('#username').data('username'), userid = $('#username').data('userid');
 var localstream, remotestream;
 var playing = false;
 var final_transcript = '';
@@ -47,7 +47,7 @@ socket.on('join confirm', function (msg) {
     curr_room = msg.room;
     peers = msg.peers;
     localstream = null;
-    console.log('received peers from server:', peers);
+    //console.log('received peers from server:', peers);
     $('#keyword').val(curr_room);
     search();
     hideActionButton();
@@ -132,7 +132,7 @@ function sendMessage() {
     }
     var text = $('#chat_message').val();
     var room_number = $("#room_number").val();
-    socket.emit('chat broadcast', {message: text, food: room_number, user: username});
+    socket.emit('chat broadcast', {text: text, food: room_number, user: userid, username: username});
     final_transcript = '';
     $('#chat_message').val("");
 }
