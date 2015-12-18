@@ -21,7 +21,7 @@ python app.py
 * Change room whenever you want and you will be connected to new foodies, but don't worry your old foodies will still help our engine to find new food for you.
 * At any time, utilize the map block to search for restaurants or cafe or bar to plan your foodie trip. Enough talk, let's eat!
 
-![screenshot of homepage](https://github.com/MonkeyLeeT/TalkyFoodie/blob/master/misc/recommend?raw=true)
+![screenshot of homepage](https://github.com/MonkeyLeeT/TalkyFoodie/blob/master/misc/recommend.png?raw=true)
 
 ##More Info
 can be found at : http://www.ee.columbia.edu/~cylin/course/bigdata/projects/ and searching for TalkyFoodie. You're welcome to mail me at tl2493@columbia.edu for any questions you might have and any contribution is greatly appreciated!
