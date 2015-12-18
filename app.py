@@ -31,6 +31,7 @@ def readSentimentList(file_name):
 
     return happy_log_probs, sad_log_probs
 
+
 def classifySentiment(words, happy_log_probs, sad_log_probs):
     # Get the log-probability of each word under each sentiment
     happy_probs = [happy_log_probs[word] for word in words if word in happy_log_probs]
@@ -45,6 +46,7 @@ def classifySentiment(words, happy_log_probs, sad_log_probs):
     prob_sad = 1 - prob_happy
 
     return prob_happy, prob_sad
+
 
 def list_all_dict(dict_a):
     scorefile = open('scorefile.txt', 'w')
@@ -68,7 +70,7 @@ def analyze(sentence, dic):
                         mean = dic[user_name][word][0]
                         count = dic[user_name][word][1]
                         mean = (mean*count+tweet_happy_prob)/(count+1)
-                        count = count + 1 
+                        count += 1
                         dic[user_name][word]=[mean, count]
                     else:
                         dic[user_name].setdefault(word,[tweet_happy_prob, 1])
@@ -80,7 +82,7 @@ def analyze(sentence, dic):
                                 mean = dic[user_name][word][0]
                                 count = dic[user_name][word][1]
                                 mean = (mean*count+tweet_happy_prob+0.5)/(count+1)
-                                count = count + 1 
+                                count += 1
                                 dic[keys][word]=[mean, count]
                             else:
                                 dic[keys].setdefault(word,[tweet_happy_prob+0.5, 1])
@@ -90,13 +92,12 @@ def analyze(sentence, dic):
                                 mean = dic[user_name][word][0]
                                 count = dic[user_name][word][1]
                                 mean = (mean*count+tweet_happy_prob)/(count+1)
-                                count = count + 1 
+                                count += 1
                                 dic[user_name][word]=[mean, count]
                             else:
                                 dic[keys].setdefault(word,[tweet_happy_prob, 1])
-                    
-
     return dic
+
 
 @app.errorhandler(404)
 def page_not_found():
@@ -144,7 +145,7 @@ def request_join(message):
 
 @socketio.on('chat broadcast', namespace='/test')
 def room_chat(message):
-    #print (message)
+    # print (message)
     global reset
     emit('chat message receive', {'data': message['username'] + ':' + message['text']}, room=message['food'])
     fdict.update(analyze(message, fdict))
@@ -167,7 +168,7 @@ def test_connect():
 def on_leave(message):
     room = message['room']
     leave_room(room)
-    users.remove(message['username'])
+    users.pop(message['username'], none)
     emit('chat message receive', message['username'] + ' has left the room.', room=room)
     print('leave')
 

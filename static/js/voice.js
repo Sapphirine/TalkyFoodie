@@ -74,7 +74,6 @@ socket.on('error', function (e) {
 
 
 // https://github.com/GoogleChrome/webplatform-samples/blob/master/webspeechdemo/webspeechdemo.html
-
 if ('webkitSpeechRecognition' in window) {
     var recognition = new webkitSpeechRecognition();
     recognition.continuous = true;
@@ -115,7 +114,7 @@ if ('webkitSpeechRecognition' in window) {
 $('#play').click(function () {
     if (!playing) {
         playing = true;
-        console.log('opened');
+        //console.log('opened');
         if (!localstream) {
             connectPeers();
         } else {
@@ -130,7 +129,7 @@ $('#play').click(function () {
         $('#mic').switchClass('unmute', 'mute', '10', 'linear');
         $(this).switchClass('green', 'red', 2000, 'swing');
     } else {
-        console.log('closed');
+        //console.log('closed');
         if (recognition) recognition.stop();
         if (localstream) localstream.getTracks()[0].enabled = false;
         playing = false;

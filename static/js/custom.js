@@ -21,7 +21,7 @@ peer.on('open', function (id) {
 });
 
 peer.on('call', function (call) {
-    console.log('got called');
+    //console.log('got called');
     if (!playing) {
         call.answer();
     } else {
@@ -93,13 +93,13 @@ function pressToSend(event) {
     }
 }
 function connectPeers() {
-    console.log('try to connect to ', peers);
+    //console.log('try to connect to ', peers);
     for (var i = 0; i < peers.length; ++i) {
         var other = peers[i];
         if (other != peer_id) {
             !function (other) {
                 navigator.getUserMedia({video: false, audio: true}, function (stream) {
-                    console.log('called', other);
+                    //console.log('called', other);
                     localstream = stream;
                     process(localstream);
                     localcall = peer.call(other, stream);
@@ -118,7 +118,7 @@ function onReceiveStream(stream) {
     var audio = document.querySelector('audio');
     audio.src = window.URL.createObjectURL(stream);
     audio.onloadedmetadata = function (e) {
-        console.log('now playing the audio');
+        //console.log('now playing the audio');
         audio.play();
     }
 }

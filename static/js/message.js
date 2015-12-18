@@ -1,5 +1,5 @@
 function recommend(msg) {
-    console.log(msg);
+    //console.log(msg);
     if (msg[userid]) {
         $('#foodrecommend').slideUp("slow", function () {
             var foods = msg[userid];
