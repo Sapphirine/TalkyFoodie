@@ -5,7 +5,6 @@ function qing() {
     var spam = $('#spam');
     if (!spamming) {
         spam_event = setInterval(function () {
-            console.log(123);
             socket.send('spam');
         }, 500);
         spam.text('STOP');

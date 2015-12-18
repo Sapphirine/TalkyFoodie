@@ -5,7 +5,7 @@ import names, random
 import numpy as np
 import threading
 from pyspark.mllib.recommendation import ALS, MatrixFactorizationModel, Rating
-
+import recommend
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -16,10 +16,12 @@ peers = {}
 fdict = {}
 words = open("words.txt").read().splitlines()
 foods = open("foodlist.txt").read().splitlines()
-users = {}, userids = {}
-fakeusers = []
+users = {}
+fakeusers = {}
 for i in range(10):
-    fakeusers.append(names.get_first_name())
+    name = names.get_first_name()
+    fakeusers.setdefault(name)
+    fakeusers[name] = random.choice(range(00000, 99999))
 
 def readSentimentList(file_name):
     ifile = open(file_name, 'r')
@@ -53,7 +55,7 @@ def list_all_dict(dict_a):
     scorefile = open('scorefile.txt', 'w')
     for keys in dict_a:
         for k in dict_a[keys]:
-            scorefile.writelines(str(keys)+','+str(k)+','+str(dict_a[keys][k][0])+'\n')
+            scorefile.writelines(str(keys)+','+str(foods.index(k))+','+str(dict_a[keys][k][0])+'\n')
     global t
     t = threading.Timer(30.0, list_all_dict, [fdict])  
     t.start() 
@@ -114,7 +116,7 @@ def home():
         while True:
             session['username'] = names.get_first_name()
             if session['username'] not in users:
-                users[session['username']] = random(range(00000, 99999), 1)
+                users[session['username']] = random.choice(range(00000, 99999))
                 break
     print (session['username'])
     return render_template("index.html", myUserName=session['username'], myUserID=users[session['username']])
@@ -122,7 +124,7 @@ def home():
 
 @socketio.on('request random', namespace='/test')
 def request_random(message):
-    print message
+    print (message)
     room = random.choice(foods)
     join_room(room)
     if room not in peers:
@@ -133,7 +135,7 @@ def request_random(message):
 
 @socketio.on('request join', namespace='/test')
 def request_join(message):
-    print message
+    print (message)
     from_room = message['from']
     to_room = message['to']
     leave_room(from_room)
@@ -170,21 +172,21 @@ def on_leave(message):
 @socketio.on('message', namespace='/test')
 def spam(message):
     global count
-    random_user = random.choice(fakeusers)
+    random_user_id = random.choice(list(fakeusers.values()))
     random_food = random.choice(foods)
-    random_sentence = {'user': random_user, 'food': random_food, 'message': (' '.join(random.sample(words, 10))).join(random.sample(foods, 2))}
-    #work on this function!
+    random_sentence = {'user': random_user_id, 'food': random_food, 'message': (' '.join(random.sample(words, 10))).join(random.sample(foods, 2))}
     print(random_sentence['message'])
     fdict.update(analyze(random_sentence, fdict))
     count = count + 1
     if count >= 10:
         count = 0
-        recommend(fdict)
-        emit('recommendation receive', fdict[random_user])
+        list_all_dict(fdict)
+        foods_recommend = []
+        result = recommend.Recommendation('scorefile.txt', foods)
+        emit('recommendation receive', result)
 
 
-def recommend(dictionary):
-    print 123
+
 
 
 if __name__ == "__main__":
