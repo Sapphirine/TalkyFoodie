@@ -56,7 +56,7 @@ def list_all_dict(dict_a):
 def analyze(sentence, dic):
     happy_log_probs, sad_log_probs = readSentimentList('sentiment_list.csv')
     user_name = sentence.setdefault('user')
-    lines = sentence.setdefault('text').split()
+    lines = sentence.setdefault('text').lower().split()
     hashtagfood = sentence.setdefault('food')
     dic.setdefault(user_name,{})
     tweet_happy_prob, tweet_sad_prob = classifySentiment(lines, happy_log_probs, sad_log_probs)
