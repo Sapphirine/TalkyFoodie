@@ -139,7 +139,7 @@ def request_join(message):
     if from_room:
         peers[from_room].remove(message['peer'])
     peers[to_room].append(message['peer'])
-    emit('join confirm', {'room': to_room, 'peers': peers[to_room]}, broadcast=True)
+    emit('join confirm', {'room': to_room, 'peers': peers[to_room]}, room=to_room)
 
 
 @socketio.on('chat broadcast', namespace='/test')
@@ -155,7 +155,7 @@ def room_chat(message):
         list_all_dict(fdict)
         result = recommend.Recommendation('scorefile.txt', foods)
         print result
-        emit('recommendation receive', result)
+        emit('recommendation receive', result, broadcast=True)
 
 
 @socketio.on('connect', namespace='/test')

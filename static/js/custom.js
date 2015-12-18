@@ -41,14 +41,15 @@ socket.on('connect', function () {
 
 
 socket.on('join confirm', function (msg) {
+    peers = msg.peers;
     var roomNumber = $("#room_number");
     roomNumber.val(msg.room);
     $("#roomNumberLabel").html("Room Topic: " + msg.room);
     curr_room = msg.room;
-    peers = msg.peers;
     localstream = null;
     //console.log('received peers from server:', peers);
     $('#keyword').val(curr_room);
+    $('#chatresponse').empty();
     search();
     hideActionButton();
 });
