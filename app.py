@@ -14,7 +14,7 @@ reset = 0
 roomCurrTime = {}
 peers = {}
 fdict = {}
-foods = open("foodlist.txt").read().splitlines()
+foods = open("food_list.txt").read().splitlines()
 users = {}
 
 
@@ -54,7 +54,7 @@ def list_all_dict(dict_a):
 
 
 def analyze(sentence, dic):
-    happy_log_probs, sad_log_probs = readSentimentList('twitter_sentiment_list.csv')
+    happy_log_probs, sad_log_probs = readSentimentList('sentiment_list.csv')
     user_name = sentence.setdefault('user')
     lines = sentence.setdefault('text').split()
     hashtagfood = sentence.setdefault('food')

@@ -138,3 +138,7 @@ $('#play').click(function () {
         $(this).switchClass('red', 'green', 2000, 'swing');
     }
 });
+
+$('#chat_message').click(function() {
+    final_transcript = '';
+})
