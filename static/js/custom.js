@@ -1,5 +1,5 @@
 var namespace = '/test';
-var peer_api = 'unl8wqyitfv18aor', peer_id;
+var peer_api = 'put your own peer api key', peer_id;
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
 //var peer = new Peer({host: 'localhost', port: 9000, path: '/'});
 var peer = new Peer({key: peer_api}), peers = [], localcall;
